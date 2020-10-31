@@ -1,0 +1,53 @@
+= REST API Guide
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-http-request-title: Request example
+:operation-curl-request-title: Request example(curl)
+:operation-http-response-title: Response example
+
+[[overview]]
+= 개요
+
+[[overview-http-status-codes]]
+== HTTP status code
+
+|===
+| Status Code | Usage
+
+| `200 OK`
+| 요청을 성공적으로 처리함
+
+| `201 Created`
+| 새 리소스를 성공적으로 생성함. 응답의 `Location` 헤더에 해당 리소스의 URI가 담겨있다.
+
+| `204 No Content`
+| 기존 리소스를 성공적으로 수정함.
+
+| `400 Bad Request`
+| 잘못된 요청을 보낸 경우. 응답 본문에 더 오류에 대한 정보가 담겨있다.
+
+| `404 Not Found`
+| 요청한 리소스가 없음.
+|===
+
+[[api]]
+= Api
+
+[[api-money]]
+== Money
+
+[[money-give]]
+=== Give
+operation::money-give[snippets='http-request,request-headers,request-fields,curl-request,http-response']
+
+[[money-take]]
+=== Take
+operation::money-take[snippets='http-request,request-headers,request-fields,curl-request,http-response']
+
+[[money-get]]
+=== GET
+operation::money-get[snippets='http-request,request-headers,request-fields,curl-request,http-response']
