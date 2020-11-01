@@ -1,6 +1,11 @@
 package com.example.demo.money.controller;
 
+import com.example.demo.money.domain.MoneyGive;
+import com.example.demo.money.domain.MoneyTake;
+import com.example.demo.util.DateUtils;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -14,7 +19,7 @@ public class MoneyDto {
   @ToString
   public static class GiveRequest {
     private int count;
-    private int amount;
+    private long amount;
   }
 
   @Getter
@@ -52,6 +57,16 @@ public class MoneyDto {
       this.amountDone = amountDone;
       this.takeList = takeList;
     }
+
+    public static Money of(MoneyGive moneyGive) {
+      List<Take> takeList = moneyGive.getMoneyTakes().stream().map(Take::of).collect(Collectors.toList());
+      return Money.builder()
+          .scatteredTime(DateUtils.getEpochMilli(moneyGive.getCreatedDate()))
+          .amount(moneyGive.getAmount())
+          .amountDone(moneyGive.getAmountDone())
+          .takeList(takeList)
+          .build();
+    }
   }
 
   @Getter
@@ -65,6 +80,10 @@ public class MoneyDto {
     public Take(String userId, long amount) {
       this.userId = userId;
       this.amount = amount;
+    }
+
+    public static Take of(MoneyTake moneyTake) {
+      return new Take(moneyTake.getUserId(), moneyTake.getAmount());
     }
   }
 

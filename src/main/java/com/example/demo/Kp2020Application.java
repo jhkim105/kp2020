@@ -1,9 +1,16 @@
 package com.example.demo;
 
+import com.example.demo.config.JpaConfig;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
+@Import(JpaConfig.class)
 public class Kp2020Application {
 
   public static void main(String[] args) {
@@ -11,3 +18,4 @@ public class Kp2020Application {
   }
 
 }
+

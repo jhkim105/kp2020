@@ -1,0 +1,2 @@
+insert into km_money_give (id, room_id, token, amount, count, created_by, created_date) values ('test01', 'room01', 'T01', 10000, 2, 'user01', '2020-10-21 10:00:00');
+insert into km_money_give (id, room_id, token, amount, count, created_by, created_date, finished_date) values ('test02', 'room01', 'T02', 10000, 2, 'user01', '2020-10-21 10:00:10', '2020-10-21 10:09:21');

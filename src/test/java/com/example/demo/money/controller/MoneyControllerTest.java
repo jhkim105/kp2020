@@ -1,4 +1,4 @@
-package com.example.demo.distribute;
+package com.example.demo.money.controller;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -8,7 +8,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,8 +17,12 @@ import com.example.demo.money.controller.MoneyController;
 import com.example.demo.money.controller.MoneyDto;
 import com.example.demo.money.controller.MoneyDto.Money;
 import com.example.demo.money.controller.MoneyDto.Take;
-import com.example.demo.money.controller.MoneyService;
+import com.example.demo.money.domain.MoneyGive;
+import com.example.demo.money.domain.MoneyTake;
+import com.example.demo.money.service.MoneyCreateDto;
+import com.example.demo.money.service.MoneyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(value = MoneyController.class)
 @AutoConfigureRestDocs
@@ -53,18 +57,25 @@ class MoneyControllerTest {
   private MoneyService moneyService;
 
   @Test
-  void testGive() throws Exception {
+  void give() throws Exception {
     // give
     String token = UUID.randomUUID().toString();
-    given(moneyService.create()).willReturn(token);
+    String userId = "user01";
+    String roomId = "room01";
+    long amount = 10000l;
+    int count = 5;
+    MoneyCreateDto moneyCreateDto = MoneyCreateDto.builder()
+        .userId(userId)
+        .roomId(roomId)
+        .amount(amount)
+        .count(count)
+        .build();
+    given(moneyService.create(moneyCreateDto)).willReturn(token);
 
     Map<String, String> params = new HashMap<>();
     params.put("count", "5");
     params.put("amount", "10000");
     String requestBody = objectMapper.writeValueAsString(params);
-
-    String userId = "user01";
-    String roomId = "room01";
 
     // when
     ResultActions resultActions = mockMvc
@@ -95,7 +106,7 @@ class MoneyControllerTest {
   }
 
   @Test
-  void testTake() throws Exception {
+  void take() throws Exception {
     // give
     String token = UUID.randomUUID().toString();
 
@@ -131,7 +142,7 @@ class MoneyControllerTest {
   }
 
   @Test
-  void testGet() throws Exception {
+  void get() throws Exception {
     // give
     String token = UUID.randomUUID().toString();
 
@@ -140,23 +151,36 @@ class MoneyControllerTest {
     String receiveUserId01 = "user02";
     String receiveUserId02 = "user03";
 
-    Take take = Take.builder().userId(receiveUserId01).amount(2000).build();
-    Take take2 = Take.builder().userId(receiveUserId02).amount(2000).build();
-    List<Take> takeList = new ArrayList<>();
-    takeList.add(take);
-    takeList.add(take2);
-    MoneyDto.Money money = Money.builder()
-        .amount(10000)
-        .amountDone(4000)
-        .takeList(takeList)
-        .scatteredTime(new Date().getTime())
+    MoneyGive moneyGive = MoneyGive.builder()
+        .roomId(roomId)
+        .createdBy(userId)
+        .amount(10000l)
+        .count(2)
+        .createdDate(LocalDateTime.now().minusMinutes(5))
+        .token(token)
         .build();
 
-    given(moneyService.getMoney(token)).willReturn(money);
+    MoneyTake moneyTake1 = MoneyTake.builder()
+        .moneyGive(moneyGive)
+        .amount(5000l)
+        .userId("user02")
+        .build();
+
+    MoneyTake moneyTake2 = MoneyTake.builder()
+        .moneyGive(moneyGive)
+        .amount(5000l)
+        .userId("user03")
+        .build();
+
+    moneyGive.getMoneyTakes().add(moneyTake1);
+    moneyGive.getMoneyTakes().add(moneyTake2);
+
+
+    given(moneyService.getMoney(token)).willReturn(moneyGive);
 
     // when
     ResultActions resultActions = mockMvc
-        .perform(get("/money")
+        .perform(MockMvcRequestBuilders.get("/money")
             .param("token", token)
             .header(MoneyDto.HEADER_X_ROOM_ID, roomId)
             .header(MoneyDto.HEADER_X_USER_ID, userId)
