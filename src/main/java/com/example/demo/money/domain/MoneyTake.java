@@ -19,7 +19,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "km_money_take")
-@EqualsAndHashCode(of = {"moneyGive", "userId"})
+@EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
@@ -41,7 +41,7 @@ public class MoneyTake {
   @Column(nullable = false, updatable = false)
   private Long amount;
 
-  @Column(name = "received_date")
+  @Column(name = "received_date", insertable = false)
   private LocalDateTime receivedDate;
 
   @Builder

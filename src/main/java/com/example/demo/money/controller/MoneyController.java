@@ -2,7 +2,9 @@ package com.example.demo.money.controller;
 
 import com.example.demo.money.controller.MoneyDto.GiveResponse;
 import com.example.demo.money.controller.MoneyDto.Money;
+import com.example.demo.money.controller.MoneyDto.TakeResponse;
 import com.example.demo.money.domain.MoneyGive;
+import com.example.demo.money.domain.MoneyTake;
 import com.example.demo.money.service.MoneyCreateDto;
 import com.example.demo.money.service.MoneyService;
 import com.example.demo.money.service.MoneyTakeDto;
@@ -27,7 +29,7 @@ public class MoneyController {
   public ResponseEntity<MoneyDto.GiveResponse> give(
       @RequestHeader(MoneyDto.HEADER_X_USER_ID) String userId,
       @RequestHeader(MoneyDto.HEADER_X_ROOM_ID) String roomId,
-      MoneyDto.GiveRequest giveRequest) {
+      @RequestBody MoneyDto.GiveRequest giveRequest) {
 
     MoneyCreateDto moneyCreateDto = MoneyCreateDto.builder()
         .userId(userId)
@@ -42,7 +44,7 @@ public class MoneyController {
 
 
   @PostMapping("/take")
-  public ResponseEntity<?> take(
+  public ResponseEntity<MoneyDto.TakeResponse> take(
       @RequestHeader(MoneyDto.HEADER_X_USER_ID) String userId,
       @RequestHeader(MoneyDto.HEADER_X_ROOM_ID) String roomId,
       @RequestBody MoneyDto.TakeRequest takeRequest) {
@@ -53,8 +55,9 @@ public class MoneyController {
         .token(takeRequest.getToken())
         .build();
 
-    moneyService.take(moneyTakeDto);
-    return ResponseEntity.ok().build();
+    MoneyTake moneyTake = moneyService.take(moneyTakeDto);
+    MoneyDto.TakeResponse takeResponse = TakeResponse.of(moneyTake);
+    return ResponseEntity.ok(takeResponse);
   }
 
   @GetMapping

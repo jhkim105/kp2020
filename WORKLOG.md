@@ -36,6 +36,22 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
 ### Repository Tests(@DataJpaTest)
 * JpaConfig를 load하지 못한다. @Import문을 추가했음. 
  
+## STEP3
+* Integration Tests 작성
+ - Jpa 관련 에러나서 필요한 곳에서 JpaConfig를 import 하는 것으로 변경
+ - Unit Tests에서 걸러져야 할 오류들이 Integration Test에서 다수 발견됨.
+ - MockMvc를 활용한 테스트는 응답값을 검증하는 것인데, Integration Tests에 적합한가?
+   - 실제로 Data가 의도한 대로 생성되었는지 확인하기가 어려움.
+   - Service method에 대한 Integration Tests 작성 필요함. 이럴 경우 기존 Integration Test에 통합할 것인가 아니면 별도(ServiceIntegrationTest)로 작성할 것인가? 
+ - 연결된 테스트를 효과 적으로 하는 방법? give -> take
+* @Test와 @Transactional을 주면 insert/update 쿼리가 실행되고, 테스트 후에 Rollback한다.
+* MockBean에서 메소드 파라미터로 사용되는 Dto는 EqualsAndHashCode를 override 해야 한다.
+
+
+
+
+  
+ 
  
  
 # Summary
@@ -49,18 +65,21 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
 * 할당된 돈을 가져갈때 동시성 이슈에 관하여 분배를 효율적으로 하기 위해, 자원 경쟁을 줄이기 위해 분배 데이터를 랜덤하게 할당하면 효율적일까?
 
 
-## 개발순서
+## Development Process & Strategy
 * 도메인 구현
+  - Setter를 두지 않는다.
+  - Builder는 TestCase 작성시 필요하므로 작성한다.
+  - Entity 정의시 nullable, insertable, updatable을 최대한 정의한다.
+  
 * Test Case 작성 및 Controller/Service/Repository 구현
-  * Controller Unit Tests, Service/Repository Unit Tests
-  * Controller Integration Tests
-  
-  
+  - RestDocs Documentation을 빠르게 해야하는 경우, Controller Unit Test를 먼저 빠르게 작성하고 그렇지 않은 경우 Integration Tests를 바로 작성한다.
+  - Unit Tests는 필요성이 생길 때 마다 바로 바로 작성한다.
+  - Controller Unit Tests와 Controller Integration Tests를 둘 다 작성하는 경우에 RestDocs, Validation Check 등을 담당하는 것이 좋겠다.
     
 ## Working Time
 * STEP1 5h
-* STEP1 5h
-
+* STEP2 5h
+* STEP3 3h
  
  
 

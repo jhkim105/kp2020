@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -38,6 +39,20 @@ public class MoneyDto {
   @ToString
   public static class TakeRequest {
     private String token;
+  }
+
+  @Getter
+  @ToString
+  public static class TakeResponse {
+    private String takeId;
+    private long amount;
+
+    public static TakeResponse of(MoneyTake moneyTake) {
+      TakeResponse takeResponse = new TakeResponse();
+      takeResponse.takeId = moneyTake.getId();
+      takeResponse.amount = moneyTake.getAmount();
+      return takeResponse;
+    }
   }
 
   @Getter

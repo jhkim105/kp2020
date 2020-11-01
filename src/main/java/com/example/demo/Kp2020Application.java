@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import(JpaConfig.class)
 public class Kp2020Application {
 
   public static void main(String[] args) {

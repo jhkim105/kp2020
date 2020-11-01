@@ -4,7 +4,6 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -13,18 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.demo.RestDocsConfiguration;
-import com.example.demo.money.controller.MoneyController;
-import com.example.demo.money.controller.MoneyDto;
-import com.example.demo.money.controller.MoneyDto.Money;
-import com.example.demo.money.controller.MoneyDto.Take;
 import com.example.demo.money.domain.MoneyGive;
 import com.example.demo.money.domain.MoneyTake;
 import com.example.demo.money.service.MoneyCreateDto;
 import com.example.demo.money.service.MoneyService;
+import com.example.demo.money.service.MoneyTakeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -38,7 +32,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import java.util.List;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(value = MoneyController.class)
@@ -58,8 +51,8 @@ class MoneyControllerTest {
 
   @Test
   void give() throws Exception {
-    // give
-    String token = UUID.randomUUID().toString();
+    // given
+    String token = "XXX";
     String userId = "user01";
     String roomId = "room01";
     long amount = 10000l;
@@ -72,9 +65,9 @@ class MoneyControllerTest {
         .build();
     given(moneyService.create(moneyCreateDto)).willReturn(token);
 
-    Map<String, String> params = new HashMap<>();
-    params.put("count", "5");
-    params.put("amount", "10000");
+    Map<String, Object> params = new HashMap<>();
+    params.put("count", count);
+    params.put("amount", amount);
     String requestBody = objectMapper.writeValueAsString(params);
 
     // when
@@ -107,17 +100,37 @@ class MoneyControllerTest {
 
   @Test
   void take() throws Exception {
-    // give
-    String token = UUID.randomUUID().toString();
+    // given
+    String token = "XXX";
 
+
+    String roomId = "room01";
+    String userId = "user02";
+
+
+    MoneyTakeDto moneyTakeDto = MoneyTakeDto.builder()
+        .roomId(roomId)
+        .userId(userId)
+        .token(token)
+        .build();
+    MoneyGive moneyGive = MoneyGive.builder()
+        .roomId(roomId)
+        .createdBy("user01")
+        .amount(10000l)
+        .count(5)
+        .createdDate(LocalDateTime.now().minusMinutes(5))
+        .token(token)
+        .build();
+
+    MoneyTake moneyTake = MoneyTake.of(moneyGive);
+    moneyGive.getMoneyTakes().add(moneyTake);
+    given(moneyService.take(moneyTakeDto)).willReturn(moneyTake);
+
+    // when
     Map<String, String> params = new HashMap<>();
     params.put("token", token);
     String requestBody = objectMapper.writeValueAsString(params);
 
-    String userId = "user01";
-    String roomId = "room01";
-
-    // when
     ResultActions resultActions = mockMvc
         .perform(post("/money/take")
             .header(MoneyDto.HEADER_X_ROOM_ID, roomId)
@@ -143,8 +156,8 @@ class MoneyControllerTest {
 
   @Test
   void get() throws Exception {
-    // give
-    String token = UUID.randomUUID().toString();
+    // given
+    String token = "XXX";
 
     String userId = "user01";
     String roomId = "room01";
