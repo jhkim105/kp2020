@@ -1,11 +1,11 @@
-# WorkLog
+## WorkLog
 
-## STEP1
+### STEP1
 * 개발환경 구성
 * 껍데기 API 구현하기
 * 도메인 구현
 
-### TestCase 구현 및 RestDocs 작성
+#### TestCase 구현 및 RestDocs 작성
 * IntegrationTests와 UnitTests
   - Controller Request/Response 검증을 위한 UnitTests 작성
   - Service/Repository/Model 구현 시 비즈니스 로직 검증을 위한 IntegrationTests 작성  
@@ -13,7 +13,7 @@
 * 실제로 해보니, 복잡한 데이터를 리턴하는 서비스 메소드를 Mock Bean으로 정의하기 어렵다. Test Data를 통해서 하는것이 쉽다. 그렇다면 Unit Test로 ControllerTest를 만들어서 Request/Response 정의하려고 하는 방법은 좋지 않은 것 같다. 
 그리고 Test를 위해서 Dto를 정의하는 경우, 별도의 Setter나 Builder를 만들어줘야 한다. <s>Controller Unit Test는 Validation Check를 하고, Documentation은 Controller Integration Test에서 하자.</s> 이것을 제한적으로(접근제한자 default로) 허용하는 것은 어떨까?
 
-### Layer Architecture
+#### Layer Architecture
 * Controller Request/Response Dto와 Service Parameter/Retrun Dto 는 공유 OR 별도
  - 공유한다면 controller와 service는 동일 package 
 * Service Interface를 만들까?
@@ -21,22 +21,22 @@
   - 그런데 전체 빌드를 통과하려면 impl class가 있어야 한다.
   - 만들지 말자.
  
-### Domain modeling
+#### Domain modeling
 Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto를 별도 만들지, Domain을 노출할지, 서비스 메소드는 어떻게 구현할지 등을 도메인이 없는 상태에서 구현하기 힘들다.
  
-## STEP2
-### Unit Tests를 작성하면서 각 레이어 구현
+### STEP2
+#### Unit Tests를 작성하면서 각 레이어 구현
 * Controller/Service 분리, Dto 공유하지 말자
 * Service Unit Tests 작성시 DB 연동관련 목 객체 정의하는 작업이 번거롭다. 그냥 리파지토리 연동해서 하는 것이 더 효율적으로 판단됨.
 * 할당된 돈을 가져갈때 동시성 이슈에 관하여 분배를 효율적으로 하기 위해, 자원 경쟁을 줄이기 위해 분배 데이터를 랜덤하게 할당하면 효율적일까?
  
-### Exception Handling
+#### Exception Handling
 * [kb2019](https://github.com/jhkim105/kb2019/tree/master/src/main/java/com/example/demo/exception) 
  
-### Repository Tests(@DataJpaTest)
+#### Repository Tests(@DataJpaTest)
 * JpaConfig를 load하지 못한다. @Import문을 추가했음. 
  
-## STEP3
+### STEP3
 * Integration Tests 작성
  - Jpa 관련 에러나서 필요한 곳에서 JpaConfig를 import 하는 것으로 변경
  - Unit Tests에서 걸러져야 할 오류들이 Integration Test에서 다수 발견됨.
@@ -54,18 +54,18 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
  
  
  
-# Summary
-## Development Issues
+## Summary
+### Development Issues
 * Test Case를 위한 코드들을 피하고 싶다. 
   - Dto에 값을 담기위해 Dto가 builder를 제공해야 하는 경우가 있음. 실 코드에서는 DB Domain객체로 부터 값을 할당함.
   - 이것을 허용해야 되는 상황이 많을 듯. builder 정도는 허용해도 괜찮지 않을까? 생성에는 열려있고, 변경에는 제한적이니까. 
 * Service Unit Tests 작성시 DB 연동관련 목 객체 정의하는 작업이 번거롭다. 그냥 리파지토리 연동해서 하는 것이 더 효율적이지 않을까? 메소드 성격을 보고 선별적으로 Unit Test를 작성해야겠다.
 
-## Domain Issues
+### Domain Issues
 * 할당된 돈을 가져갈때 동시성 이슈에 관하여 분배를 효율적으로 하기 위해, 자원 경쟁을 줄이기 위해 분배 데이터를 랜덤하게 할당하면 효율적일까?
 
 
-## Development Process & Strategy
+### Development Process & Strategy
 * 도메인 구현
   - Setter를 두지 않는다.
   - Builder는 TestCase 작성시 필요하므로 작성한다.
@@ -76,10 +76,14 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
   - Unit Tests는 필요성이 생길 때 마다 바로 바로 작성한다.
   - Controller Unit Tests와 Controller Integration Tests를 둘 다 작성하는 경우에 RestDocs, Validation Check 등을 담당하는 것이 좋겠다.
     
-## Working Time
+### Working Time
 * STEP1 5h
 * STEP2 5h
 * STEP3 3h
+ 
+ 
+## TODO
+* 404 handling
  
  
 

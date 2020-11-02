@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,7 @@ class MoneyControllerTest {
 
     // when
     ResultActions resultActions = mockMvc
-        .perform(post("/money/give")
+        .perform(post("/money/give1")
             .header(MoneyDto.HEADER_X_ROOM_ID, roomId)
             .header(MoneyDto.HEADER_X_USER_ID, userId)
           .contentType(MediaType.APPLICATION_JSON)
