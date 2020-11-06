@@ -1,8 +1,7 @@
 package com.example.demo.money.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -10,8 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.demo.MockMvcTestConfig;
 import com.example.demo.config.JpaConfig;
-import com.example.demo.exception.ErrorCodes;
-import com.example.demo.money.domain.MoneyGive;
 import com.example.demo.money.repository.MoneyGiveRepository;
 import com.example.demo.money.service.MoneyCreateDto;
 import com.example.demo.money.service.MoneyService;
@@ -19,7 +16,6 @@ import com.example.demo.money.service.MoneyTakeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,32 +72,6 @@ public class MoneyControllerIntegrationTest {
 
   }
 
-
-  @Test
-  void give_ERRROR_REMAINDER_MUST_ZERO() throws Exception {
-    // when
-    String userId = "user01";
-    String roomId = "room01";
-    long amount = 10000l;
-    int count = 3;
-    Map<String, Object> params = new HashMap<>();
-    params.put("count", count);
-    params.put("amount", amount);
-    String requestBody = objectMapper.writeValueAsString(params);
-    ResultActions resultActions = mockMvc
-        .perform(post("/money/give")
-            .header(MoneyDto.HEADER_X_ROOM_ID, roomId)
-            .header(MoneyDto.HEADER_X_USER_ID, userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody))
-        .andDo(print());
-
-    // then
-    resultActions.andExpect(status().isBadRequest())
-        .andExpect(jsonPath("code").value(ErrorCodes.REMAINDER_MUST_ZERO.getCode())); // how to length check
-
-  }
-
   @Test
   @Transactional
   void take() throws Exception {
@@ -132,7 +102,7 @@ public class MoneyControllerIntegrationTest {
 
     // then
     resultActions.andExpect(status().isOk())
-        .andExpect(jsonPath("amount").value("2000"))
+        .andExpect(jsonPath("amount", greaterThan(0)))
     ;
 
   }
