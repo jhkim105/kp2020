@@ -6,8 +6,9 @@ import com.example.demo.money.domain.MoneyGive;
 import com.example.demo.money.domain.MoneyTake;
 import com.example.demo.money.repository.MoneyGiveRepository;
 import com.example.demo.money.repository.MoneyTakeRepository;
+import com.example.demo.util.NumberUtils;
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,22 +30,20 @@ public class MoneyService {
     checkScatteringPossible(moneyCreateDto.getAmount(), moneyCreateDto.getCount());
     MoneyGive moneyGive = createMoneyGive(moneyCreateDto);
     createMoneyTake(moneyGive);
-
+    moneyGive = moneyGiveRepository.save(moneyGive);
     return moneyGive.getToken();
   }
 
   private MoneyGive createMoneyGive(MoneyCreateDto moneyCreateDto) {
     String token = moneyGiveRepository.buildToken();
-    MoneyGive moneyGive = moneyCreateDto.toMoneyGive(token);
-    moneyGive = moneyGiveRepository.save(moneyGive);
-    return moneyGive;
+    return moneyCreateDto.toMoneyGive(token);
   }
 
   private void createMoneyTake(MoneyGive moneyGive) {
-    IntStream.range(0, moneyGive.getCount()).forEach( i -> {
-        MoneyTake moneyTake = MoneyTake.of(moneyGive);
-        moneyTake = moneyTakeRepository.save(moneyTake);
-        moneyGive.getMoneyTakes().add(moneyTake); // HashCode issue
+    long[] scatteredMoneyArray = NumberUtils.randomNumbers(moneyGive.getAmount(), moneyGive.getCount());
+    Arrays.stream(scatteredMoneyArray).forEach(amount -> {
+      MoneyTake moneyTake = MoneyTake.of(moneyGive, amount);
+      moneyGive.getMoneyTakes().add(moneyTake);
     });
   }
 
@@ -60,10 +59,6 @@ public class MoneyService {
 
     if(amount < count) {
       throw new BusinessException(ErrorCodes.AMOUNT_LESS_THAN_COUNT);
-    }
-
-    if ( amount % count !=0 ) {
-      throw new BusinessException(ErrorCodes.REMAINDER_MUST_ZERO);
     }
 
   }

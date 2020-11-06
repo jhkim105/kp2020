@@ -52,10 +52,10 @@ public class MoneyTake {
     this.receivedDate = receivedDate; // for TC
   }
 
-  public static MoneyTake of(MoneyGive moneyGive) {
+  public static MoneyTake of(MoneyGive moneyGive, long amount) {
     return MoneyTake.builder()
         .moneyGive(moneyGive)
-        .amount(moneyGive.getAmountPerPerson())
+        .amount(amount)
         .build();
   }
 

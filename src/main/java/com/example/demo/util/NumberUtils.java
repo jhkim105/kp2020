@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NumberUtils {
 
-  public static int[] randomNumbers(int sum, int count) {
-    int[] ret = new int[count];
-    for (int i = 0; i < sum; i++) {
+  public static long[] randomNumbers(long sum, int count) {
+    long[] ret = new long[count];
+    for (long i = 0; i < sum; i++) {
       ret[(int) (Math.random() * count)]++;
     }
     return ret;

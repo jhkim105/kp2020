@@ -1,10 +1,9 @@
 package com.example.demo.money.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,8 +19,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -40,7 +37,7 @@ public class MoneyGive {
 
   @OneToMany(mappedBy = "moneyGive", cascade = CascadeType.PERSIST)
   private
-  Set<MoneyTake> moneyTakes = new HashSet<>();
+  List<MoneyTake> moneyTakes = new ArrayList<>();
 
   @Column(name = "room_id", length = ColumnLengths.UUID, nullable = false, updatable = false)
   private String roomId;
@@ -71,11 +68,6 @@ public class MoneyGive {
     this.createdDate = createdDate;
     this.createdBy = createdBy;
     this.token = token;
-  }
-
-  @Transient
-  public long getAmountPerPerson() {
-    return amount / count;
   }
 
   @Transient

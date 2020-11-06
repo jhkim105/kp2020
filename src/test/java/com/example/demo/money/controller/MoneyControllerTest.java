@@ -71,7 +71,7 @@ class MoneyControllerTest {
 
     // when
     ResultActions resultActions = mockMvc
-        .perform(post("/money/give1")
+        .perform(post("/money/give")
             .header(MoneyDto.HEADER_X_ROOM_ID, roomId)
             .header(MoneyDto.HEADER_X_USER_ID, userId)
           .contentType(MediaType.APPLICATION_JSON)
@@ -121,7 +121,7 @@ class MoneyControllerTest {
         .token(token)
         .build();
 
-    MoneyTake moneyTake = MoneyTake.of(moneyGive);
+    MoneyTake moneyTake = MoneyTake.of(moneyGive, 1000l);
     moneyGive.getMoneyTakes().add(moneyTake);
     given(moneyService.take(moneyTakeDto)).willReturn(moneyTake);
 

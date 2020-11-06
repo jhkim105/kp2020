@@ -89,7 +89,7 @@ class MoneyServiceTest {
         .token(testToken)
         .build();
 
-    MoneyTake moneyTake = MoneyTake.of(moneyGive);
+    MoneyTake moneyTake = MoneyTake.of(moneyGive, 1000l);
     moneyGive.getMoneyTakes().add(moneyTake);
 
     given(moneyGiveRepository.findByTokenAndFinishedDateIsNull(testToken)).willReturn(Optional.of(moneyGive));
