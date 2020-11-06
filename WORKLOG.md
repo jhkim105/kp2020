@@ -94,7 +94,8 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
 * STEP1 5h
 * STEP2 5h
 * STEP3 3h
- 
+* REFACTORING - 1h
+* STEP4 3h 
  
 ## TODO
 * 404 handling
