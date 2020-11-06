@@ -7,7 +7,6 @@ import com.example.demo.money.domain.MoneyGive;
 import com.example.demo.money.domain.MoneyTake;
 import com.example.demo.money.repository.MoneyGiveRepository;
 import com.example.demo.money.repository.MoneyTakeRepository;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,7 +84,6 @@ class MoneyServiceTest {
         .createdBy(userId)
         .amount(amount)
         .count(count)
-        .createdDate(LocalDateTime.now().minusMinutes(5))
         .token(testToken)
         .build();
 

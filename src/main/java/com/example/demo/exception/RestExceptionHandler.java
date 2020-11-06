@@ -24,20 +24,20 @@ public class RestExceptionHandler {
 
   @ExceptionHandler({ BusinessException.class })
   protected ResponseEntity<Object> handleBusinessException(BusinessException ex, WebRequest request) {
-    return handleException(ex.getErrorCodes(), ex.getMessage(), request, ex);
+    return handleException(ex.getErrorCode(), ex.getMessage(), request, ex);
   }
 
   @ExceptionHandler({ Exception.class })
   protected ResponseEntity<Object> handleException(Exception ex, WebRequest request) {
-    return handleException(ErrorCodes.SYSTEM_ERROR, "", request, ex);
+    return handleException(ErrorCode.SYSTEM_ERROR, "", request, ex);
   }
 
-  protected ResponseEntity<Object> handleException(ErrorCodes errorCodes, String message, WebRequest request, Throwable cause) {
-    HttpStatus status = errorCodes.getStatus();
+  protected ResponseEntity<Object> handleException(ErrorCode errorCode, String message, WebRequest request, Throwable cause) {
+    HttpStatus status = errorCode.getStatus();
     request.setAttribute("javax.servlet.error.status_code", status.value(), WebRequest.SCOPE_REQUEST);
     Map<String, Object> errorAttributeMap = errorAttributes.getErrorAttributes(request, false);
-    errorAttributeMap.put("code", errorCodes.getCode());
-    errorAttributeMap.put("message", errorCodes.getMessage());
+    errorAttributeMap.put("code", errorCode.getCode());
+    errorAttributeMap.put("message", errorCode.getMessage());
     if (StringUtils.equals("always", stacktrace))
       errorAttributes.getError(request).printStackTrace();
     return new ResponseEntity<>(errorAttributeMap, new HttpHeaders(), status);

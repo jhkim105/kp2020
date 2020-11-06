@@ -1,7 +1,7 @@
 package com.example.demo.money.service;
 
 import com.example.demo.exception.BusinessException;
-import com.example.demo.exception.ErrorCodes;
+import com.example.demo.exception.ErrorCode;
 import com.example.demo.money.domain.MoneyGive;
 import com.example.demo.money.domain.MoneyTake;
 import com.example.demo.money.repository.MoneyGiveRepository;
@@ -58,7 +58,7 @@ public class MoneyService {
     }
 
     if(amount < count) {
-      throw new BusinessException(ErrorCodes.AMOUNT_LESS_THAN_COUNT);
+      throw new BusinessException(ErrorCode.AMOUNT_LESS_THAN_COUNT);
     }
 
   }
@@ -67,9 +67,9 @@ public class MoneyService {
   @Transactional
   public MoneyTake take(MoneyTakeDto moneyTakeDto) {
     Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByTokenAndFinishedDateIsNull(moneyTakeDto.getToken());
-    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCodes.NOT_EXISTS_MONEY_GIVE));
+    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
     Optional<MoneyTake> optionalMoneyTake = moneyGiveOptional.get().getAvailableMoneyTake();
-    optionalMoneyTake.orElseThrow(() -> new BusinessException(ErrorCodes.NOT_EXISTS_MONEY_TAKE));
+    optionalMoneyTake.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_TAKE));
     MoneyTake moneyTake = optionalMoneyTake.get();
     moneyTake.receive(moneyTakeDto.getUserId());
     return moneyTakeRepository.save(moneyTake);
@@ -78,7 +78,7 @@ public class MoneyService {
   @Transactional(readOnly = true)
   public MoneyGive getMoney(String token) {
     Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByToken(token);
-    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCodes.NOT_EXISTS_MONEY_GIVE));
+    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
     return moneyGiveOptional.get();
   }
 }

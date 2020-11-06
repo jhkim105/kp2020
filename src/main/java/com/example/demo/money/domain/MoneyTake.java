@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,11 +19,13 @@ import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "km_money_take")
+@Table(name = "km_money_take",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"money_give_id", "user_id"})
+)
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@ToString
+@ToString(exclude = {"moneyGive"})
 public class MoneyTake {
 
   @Id
@@ -35,7 +38,7 @@ public class MoneyTake {
   @JoinColumn(name = "money_give_id", updatable = false)
   private MoneyGive moneyGive;
 
-  @Column(length = ColumnLengths.UUID)
+  @Column(name = "user_id", length = ColumnLengths.UUID)
   private String userId;
 
   @Column(nullable = false, updatable = false)

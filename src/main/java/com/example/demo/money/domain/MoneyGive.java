@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -20,6 +21,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.CollectionUtils;
 
 @Entity
 @Table(name = "km_money_give")
@@ -27,6 +31,7 @@ import org.hibernate.annotations.GenericGenerator;
 @ToString
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class MoneyGive {
 
   @Id
@@ -49,6 +54,7 @@ public class MoneyGive {
   private Integer count;
 
   @Column(name = "created_date", nullable = false, updatable = false)
+  @CreatedDate
   private LocalDateTime createdDate;
 
   @Column(name = "created_by", length = ColumnLengths.UUID, nullable = false, updatable = false)
@@ -61,19 +67,22 @@ public class MoneyGive {
   private LocalDateTime finishedDate;
 
   @Builder
-  public MoneyGive(String roomId, Long amount, Integer count, LocalDateTime createdDate, String createdBy, String token) {
+  public MoneyGive(String roomId, Long amount, Integer count, String createdBy, String token) {
     this.roomId = roomId;
     this.amount = amount;
     this.count = count;
-    this.createdDate = createdDate;
     this.createdBy = createdBy;
     this.token = token;
   }
 
   @Transient
   public Optional<MoneyTake> getAvailableMoneyTake() {
-    MoneyTake moneyTake = this.moneyTakes.stream().filter(MoneyTake::isNotReceived).collect(Collectors.toList()).get(0);
-    return Optional.of(moneyTake);
+    MoneyTake moneyTake = null;
+    List<MoneyTake> usableMoneyTakes = this.moneyTakes.stream().filter(MoneyTake::isNotReceived).collect(Collectors.toList());
+    if (!CollectionUtils.isEmpty(usableMoneyTakes)) {
+      moneyTake = usableMoneyTakes.get(0);
+    }
+    return Optional.ofNullable(moneyTake);
   }
 
   @Transient

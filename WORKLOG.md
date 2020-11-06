@@ -36,7 +36,7 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
 #### Repository Tests(@DataJpaTest)
 * JpaConfig를 load하지 못한다. @Import문을 추가했음. 
  
-### STEP3
+### STEP3 - Integration Test
 * Integration Tests 작성
  - Jpa 관련 에러나서 필요한 곳에서 JpaConfig를 import 하는 것으로 변경
  - Unit Tests에서 걸러져야 할 오류들이 Integration Test에서 다수 발견됨.
@@ -46,6 +46,18 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
  - 연결된 테스트를 효과 적으로 하는 방법? give -> take
 * @Test와 @Transactional을 주면 insert/update 쿼리가 실행되고, 테스트 후에 Rollback한다.
 * MockBean에서 메소드 파라미터로 사용되는 Dto는 EqualsAndHashCode를 override 해야 한다.
+
+### STEP4 - Concurrency Test
+* 동시성 테스트 방법
+  - Parallel Streams
+  - Fork/Join
+
+* References
+  - https://www.baeldung.com/java-testing-multithreaded
+  - https://www.baeldung.com/java-fork-join
+
+
+
 
 
 

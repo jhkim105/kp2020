@@ -1,7 +1,6 @@
 package com.example.demo.money.service;
 
 import com.example.demo.money.domain.MoneyGive;
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,7 +30,6 @@ public class MoneyCreateDto {
         .roomId(this.roomId)
         .amount(this.amount)
         .count(this.count)
-        .createdDate(LocalDateTime.now())
         .token(token)
         .build();
   }

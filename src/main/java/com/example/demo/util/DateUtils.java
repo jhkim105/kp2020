@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 public final class DateUtils {
 
   public static long getEpochMilli(LocalDateTime localDateTime) {
+    if (localDateTime == null)
+      return 0;
     return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
   }
 }

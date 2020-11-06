@@ -18,7 +18,6 @@ import com.example.demo.money.service.MoneyCreateDto;
 import com.example.demo.money.service.MoneyService;
 import com.example.demo.money.service.MoneyTakeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -117,7 +116,6 @@ class MoneyControllerTest {
         .createdBy("user01")
         .amount(10000l)
         .count(5)
-        .createdDate(LocalDateTime.now().minusMinutes(5))
         .token(token)
         .build();
 
@@ -168,7 +166,6 @@ class MoneyControllerTest {
         .createdBy(userId)
         .amount(10000l)
         .count(2)
-        .createdDate(LocalDateTime.now().minusMinutes(5))
         .token(token)
         .build();
 
