@@ -48,6 +48,9 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
 * MockBean에서 메소드 파라미터로 사용되는 Dto는 EqualsAndHashCode를 override 해야 한다.
 
 ### STEP4 - Concurrency Test
+* Distributed Lock using Hazelcast
+  - https://docs.hazelcast.org/docs/latest/manual/html-single/#lock 
+  
 * 동시성 테스트 방법
   - Parallel Streams
   - Fork/Join
@@ -55,14 +58,6 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
 * References
   - https://www.baeldung.com/java-testing-multithreaded
   - https://www.baeldung.com/java-fork-join
-
-
-
-
-
-
-  
- 
  
  
 ## Summary
