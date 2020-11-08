@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -46,6 +47,9 @@ public class MoneyTake {
 
   @Column(name = "received_date", insertable = false)
   private LocalDateTime receivedDate;
+
+  @Version
+  private Integer version;
 
   @Builder
   public MoneyTake(MoneyGive moneyGive, Long amount, String userId, LocalDateTime receivedDate) {

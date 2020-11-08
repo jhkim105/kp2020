@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @SpringBootTest
 @Slf4j
@@ -60,7 +61,7 @@ public class ConcurrencyTest {
       MoneyTake moneyTake = moneyService.take(dto);
       moneyTakeList.add(moneyTake);
       log.debug("{}:{}", userId, moneyTake);
-    } catch(BusinessException ex) {
+    } catch(BusinessException | ObjectOptimisticLockingFailureException ex) {
       log.debug(ex.getMessage());
     }
   }

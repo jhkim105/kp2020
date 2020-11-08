@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -65,6 +66,9 @@ public class MoneyGive {
 
   @Column(name = "finished_date", insertable = false)
   private LocalDateTime finishedDate;
+
+  @Version
+  private Integer version;
 
   @Builder
   public MoneyGive(String roomId, Long amount, Integer count, String createdBy, String token) {

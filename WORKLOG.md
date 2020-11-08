@@ -60,7 +60,7 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
   - https://www.baeldung.com/java-fork-join
  
  
-## JPA Pessimistic Locking
+### JPA Pessimistic Locking
 * Lock Mode
   - PESSIMISTIC_READ: shared lock, prevent update/delete
   - PESSIMISTIC_WRITE: exclusive lock,  prevent lock, read/update/delete
@@ -75,7 +75,24 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
   Optional<MoneyGive> findByTokenAndFinishedDateIsNull(String token);
 ```
 
+### JPA Optimistic Locking
+* Lock Mode
+  - OPTIMISTIC
+  - OPTIMISTIC_FORCE_INCREMENT
+* OPTIMISTIC Lock Mode 일 경우 Many(MoneyTake)쪽에 두면 StaleObjectStateException 발생
+```
+Caused by: org.hibernate.StaleObjectStateException: Row was updated or deleted by another transaction (or unsaved-value mapping was incorrect) : [com.example.demo.money.domain.MoneyTake#9a2e595e-45cf-4939-93d6-a24c4dde57b3]
+	at org.hibernate.persister.entity.AbstractEntityPersister.check(AbstractEntityPersister.java:2610)
+	at org.hibernate.persister.entity.AbstractEntityPersister.update(AbstractEntityPersister.java:3454)
+	at org.hibernate.persister.entity.AbstractEntityPersister.updateOrInsert(AbstractEntityPersister.java:3317)
+	at org.hibernate.persister.entity.AbstractEntityPersister.update(AbstractEntityPersister.java:3731)
+	at org.hibernate.action.internal.EntityUpdateAction.execute(EntityUpdateAction.java:201)
+	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:604)
+	at org.hibernate.engine.spi.ActionQueue.lambda$executeActions$1(ActionQueue.java:478)
 
+```
+* OPTIMISTIC_FORCE_INCREMENT Lock Mode 일 경 ObjectOptimisticLockingFailureException 발생
+* 익셉션 발생하면서 요청이 실패하게 되므로 자동으로 재시도를 하게 하려면 추가적인 구현이 필요하다. take_using_executorService() test의 경우 10번의 시도중 9번이 실패하여 테스트케이스가 실패한다. parallelStream()과 joinFork()는 테스트케이스 성공함.
  
  
 ## Summary
