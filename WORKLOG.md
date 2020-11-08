@@ -60,6 +60,24 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
   - https://www.baeldung.com/java-fork-join
  
  
+## JPA Pessimistic Locking
+* Lock Mode
+  - PESSIMISTIC_READ: shared lock, prevent update/delete
+  - PESSIMISTIC_WRITE: exclusive lock,  prevent lock, read/update/delete
+  - PESSIMISTIC_FORCE_INCREMENT: PESSIMISTIC_WRITE and version 증가
+* PESSIMISTIC_READ, PESSIMISTIC_WRITE 둘다 for update 쿼리를 실행함. shared lock이 안되나? 
+* MySQL innoDB는 LOCK IN SHARED MODE와 FOR UPDATE를 지원한다. 
+  - LOCK IN SHARED MODE는 동일 트랜잭션이 끝나기 전까지만 유효하므로, auto commit mode를 꺼야 한다.
+  - FOR UPDATE를 SELECT를 가져온 이후로 해당 ROW에 대해 다른 세션의 SELECT, UPDATE, DELETE 등의 쿼리가 모두 잠김 상태가 된다. 
+ 
+```java
+  @Lock(LockModeType.PESSIMISTIC_READ)
+  Optional<MoneyGive> findByTokenAndFinishedDateIsNull(String token);
+```
+
+
+ 
+ 
 ## Summary
 ### Development Issues
 * Test Case를 위한 코드들을 피하고 싶다. 

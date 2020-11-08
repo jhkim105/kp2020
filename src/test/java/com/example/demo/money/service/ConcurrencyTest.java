@@ -27,9 +27,6 @@ public class ConcurrencyTest {
   @Autowired
   MoneyService moneyService;
 
-  @Autowired
-  MoneyConcurrentService moneyConcurrentService;
-
   String token;
   String roomId;
   long amount;
@@ -60,7 +57,7 @@ public class ConcurrencyTest {
   private void take(List<MoneyTake> moneyTakeList, String token, String roomId, String userId) {
     try {
       MoneyTakeDto dto = MoneyTakeDto.builder().roomId(roomId).userId(userId).token(token).build();
-      MoneyTake moneyTake = moneyConcurrentService.take(dto);
+      MoneyTake moneyTake = moneyService.take(dto);
       moneyTakeList.add(moneyTake);
       log.debug("{}:{}", userId, moneyTake);
     } catch(BusinessException ex) {
