@@ -1,6 +1,8 @@
 package com.example.demo.money.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.demo.config.JpaConfig;
 import com.example.demo.money.domain.MoneyGive;

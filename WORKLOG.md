@@ -61,25 +61,55 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
  
  
 ### JPA Pessimistic Locking
+* https://www.baeldung.com/jpa-pessimistic-locking
 * Lock Mode
   - PESSIMISTIC_READ: shared lock, prevent update/delete
   - PESSIMISTIC_WRITE: exclusive lock,  prevent lock, read/update/delete
   - PESSIMISTIC_FORCE_INCREMENT: PESSIMISTIC_WRITE and version 증가
+* One(MoneyGive)에 PESSIMISTIC_READ, PESSIMISTIC_WRITE 둘다 TestCase 통과
 * PESSIMISTIC_READ, PESSIMISTIC_WRITE 둘다 for update 쿼리를 실행함. shared lock이 안되나? 
 * MySQL innoDB는 LOCK IN SHARED MODE와 FOR UPDATE를 지원한다. 
   - LOCK IN SHARED MODE는 동일 트랜잭션이 끝나기 전까지만 유효하므로, auto commit mode를 꺼야 한다.
   - FOR UPDATE를 SELECT를 가져온 이후로 해당 ROW에 대해 다른 세션의 SELECT, UPDATE, DELETE 등의 쿼리가 모두 잠김 상태가 된다. 
- 
 ```java
   @Lock(LockModeType.PESSIMISTIC_READ)
   Optional<MoneyGive> findByTokenAndFinishedDateIsNull(String token);
+```
+* entityManager를 사용하는 경우 PESSIMISTIC_FORCE_INCREMENT에서 wait lock 발생
+```java
+  public MoneyTake take(MoneyTakeDto moneyTakeDto) {
+    Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByTokenAndFinishedDateIsNull(moneyTakeDto.getToken());
+    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
+    MoneyGive moneyGive = moneyGiveOptional.get();
+    entityManager.lock(moneyGive, LockModeType.PESSIMISTIC_FORCE_INCREMENT);
+```
+* method annotation 중 @Lock(LockModeType.PESSIMISTIC_FORCE_INCREMENT)를 사용할 경우 @DataJpaTest에서 에러 발생
+```
+
+java.lang.NullPointerException
+	at org.hibernate.type.IntegerType.next(IntegerType.java:70)
+	at org.hibernate.type.IntegerType.next(IntegerType.java:22)
+	at org.hibernate.persister.entity.AbstractEntityPersister.forceVersionIncrement(AbstractEntityPersister.java:1861)
+	at org.hibernate.event.internal.DefaultPostLoadEventListener.onPostLoad(DefaultPostLoadEventListener.java:54)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:102)
+	at org.hibernate.internal.FastSessionServices.firePostLoadEvent(FastSessionServices.java:295)
+	at org.hibernate.engine.internal.TwoPhaseLoad.postLoad(TwoPhaseLoad.java:512)
+	at org.hibernate.loader.Loader.initializeEntitiesAndCollections(Loader.java:1231)
+	at org.hibernate.loader.Loader.processResultSet(Loader.java:1001)
+	at org.hibernate.loader.Loader.doQuery(Loader.java:959)
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:349)
+	at org.hibernate.loader.Loader.doList(Loader.java:2850)
+	at org.hibernate.loader.Loader.doList(Loader.java:2832)
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2664)
+
 ```
 
 ### JPA Optimistic Locking
 * Lock Mode
   - OPTIMISTIC
   - OPTIMISTIC_FORCE_INCREMENT
-* OPTIMISTIC Lock Mode 일 경우 Many(MoneyTake)쪽에 두면 StaleObjectStateException 발생
+* One(MoneyGive)측은 데이터 변경이 없으므로, Many(MoneyTake) 쪽에 Lock 설정
+* OPTIMISTIC Lock Mode 일 경우 StaleObjectStateException 발생
 ```
 Caused by: org.hibernate.StaleObjectStateException: Row was updated or deleted by another transaction (or unsaved-value mapping was incorrect) : [com.example.demo.money.domain.MoneyTake#9a2e595e-45cf-4939-93d6-a24c4dde57b3]
 	at org.hibernate.persister.entity.AbstractEntityPersister.check(AbstractEntityPersister.java:2610)
@@ -91,7 +121,7 @@ Caused by: org.hibernate.StaleObjectStateException: Row was updated or deleted b
 	at org.hibernate.engine.spi.ActionQueue.lambda$executeActions$1(ActionQueue.java:478)
 
 ```
-* OPTIMISTIC_FORCE_INCREMENT Lock Mode 일 경 ObjectOptimisticLockingFailureException 발생
+* OPTIMISTIC_FORCE_INCREMENT Lock Mode 일 경우 ObjectOptimisticLockingFailureException 발생
 * 익셉션 발생하면서 요청이 실패하게 되므로 자동으로 재시도를 하게 하려면 추가적인 구현이 필요하다. take_using_executorService() test의 경우 10번의 시도중 9번이 실패하여 테스트케이스가 실패한다. parallelStream()과 joinFork()는 테스트케이스 성공함.
  
  
