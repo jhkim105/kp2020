@@ -22,7 +22,7 @@ class MoneyGiveRepositoryTest {
   MoneyGiveRepository moneyGiveRepository;
 
   @Test
-  @Sql(scripts = "/MoneyGiveRepositoryTest.sql", config = @SqlConfig(encoding = "UTF8"))
+  @Sql(scripts = "/sql/MoneyGiveRepositoryTest.sql", config = @SqlConfig(encoding = "UTF8"))
   void findByTokenAndFinishedDateIsNotNull() {
     Optional<MoneyGive> moneyGiveOptional1 = moneyGiveRepository.findByTokenAndFinishedDateIsNull("T01");
     Optional<MoneyGive> moneyGiveOptional2 = moneyGiveRepository.findByTokenAndFinishedDateIsNull("T02");
@@ -34,7 +34,7 @@ class MoneyGiveRepositoryTest {
   }
 
   @Test
-  @Sql(scripts = "/MoneyGiveRepositoryTest.sql", config = @SqlConfig(encoding = "UTF8"))
+  @Sql(scripts = "/sql/MoneyGiveRepositoryTest.sql", config = @SqlConfig(encoding = "UTF8"))
   void findByToken() {
     Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByToken("T01");
     assertTrue(moneyGiveOptional.isPresent());

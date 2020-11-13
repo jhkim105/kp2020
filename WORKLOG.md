@@ -66,16 +66,35 @@ Controller 부터 구현을 했는데, 도메인 부터 하는게 좋겠다. Dto
   - PESSIMISTIC_READ: shared lock, prevent update/delete
   - PESSIMISTIC_WRITE: exclusive lock,  prevent lock, read/update/delete
   - PESSIMISTIC_FORCE_INCREMENT: PESSIMISTIC_WRITE and version 증가
-* One(MoneyGive)에 PESSIMISTIC_READ, PESSIMISTIC_WRITE 둘다 TestCase 통과
-* PESSIMISTIC_READ, PESSIMISTIC_WRITE 둘다 for update 쿼리를 실행함. shared lock이 안되나? 
+* PESSIMISTIC_READ, PESSIMISTIC_WRITE 둘다 for update 쿼리를 실행함. shared lock이 안되나? (H2)
 * MySQL innoDB는 LOCK IN SHARED MODE와 FOR UPDATE를 지원한다. 
   - LOCK IN SHARED MODE는 동일 트랜잭션이 끝나기 전까지만 유효하므로, auto commit mode를 꺼야 한다.
   - FOR UPDATE를 SELECT를 가져온 이후로 해당 ROW에 대해 다른 세션의 SELECT, UPDATE, DELETE 등의 쿼리가 모두 잠김 상태가 된다. 
-```java
-  @Lock(LockModeType.PESSIMISTIC_READ)
-  Optional<MoneyGive> findByTokenAndFinishedDateIsNull(String token);
-```
-* entityManager를 사용하는 경우 PESSIMISTIC_FORCE_INCREMENT에서 wait lock 발생
+  - PESSIMISTIC_READ: 
+    - lock in share mode 
+    - parallelStream()에서만 테스트 케이스 통과
+    ```java
+      @Lock(LockModeType.PESSIMISTIC_READ)
+      Optional<MoneyGive> findByTokenAndFinishedDateIsNull(String token);
+    ```
+    ```sql
+    select moneygive0_.id as id1_0_, moneygive0_.amount as amount2_0_, moneygive0_.count as count3_0_, moneygive0_.created_by as created_4_0_, moneygive0_.created_date as created_5_0_, moneygive0_.finished_date as finished6_0_, moneygive0_.room_id as room_id7_0_, moneygive0_.token as token8_0_, moneygive0_.version as version9_0_ from km_money_give moneygive0_ where moneygive0_.token=? and (moneygive0_.finished_date is null) lock in share mode
+    ```
+    
+  - PESSIMISTIC_WRITE
+    - for update
+    - 테스트케이스 통과
+    ```java
+     @Lock(LockModeType.PESSIMISTIC_WRTE)
+     Optional<MoneyGive> findByTokenAndFinishedDateIsNull(String token);
+    ``` 
+    ```sql
+    select moneygive0_.id as id1_0_, moneygive0_.amount as amount2_0_, moneygive0_.count as count3_0_, moneygive0_.created_by as created_4_0_, moneygive0_.created_date as created_5_0_, moneygive0_.finished_date as finished6_0_, moneygive0_.room_id as room_id7_0_, moneygive0_.token as token8_0_, moneygive0_.version as version9_0_ from km_money_give moneygive0_ where moneygive0_.token=? and (moneygive0_.finished_date is null) for update
+    ```
+* Test시 주의사항
+  - 테스트케이스에 @Transactional을 주지 않아야 한다. multiple thread 환경에서의 테스트이므로 @Transactional 주더라도 의도한대로(rollback) 동작하지 않는다.    
+    
+* entityManager를 사용하는 경우 PESSIMISTIC_FORCE_INCREMENT을 사용하는 경우, 테스트케이스 무한로딩 상태가 됨. information_schema.innodb_lock_waits에 데이터는 없음
 ```java
   public MoneyTake take(MoneyTakeDto moneyTakeDto) {
     Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByTokenAndFinishedDateIsNull(moneyTakeDto.getToken());
@@ -132,7 +151,7 @@ Caused by: org.hibernate.StaleObjectStateException: Row was updated or deleted b
   - 이것을 허용해야 되는 상황이 많을 듯. builder 정도는 허용해도 괜찮지 않을까? 생성에는 열려있고, 변경에는 제한적이니까. 
 * Service Unit Tests 작성시 DB 연동관련 목 객체 정의하는 작업이 번거롭다. 그냥 리파지토리 연동해서 하는 것이 더 효율적이지 않을까? 메소드 성격을 보고 선별적으로 Unit Test를 작성해야겠다.
 * OneToMany 관계에서 대상 객체가 비즈니스 키가 없을 경우 cascade를 통한 저장시 hashcode 이슈가 있다. 이럴때는 Set보다는 List를 사용하는 것이 좋을까?
-
+* Concurrency(Thread Safe)를 보장하기 위한 방법으로 DB Lock을 활용하는 것 보다, Redis(Hazelcast) Distributed Lock을 사용하는 것이 테스트 하기도 쉽고, 더 안전할 것 같다.
 
 
 ### Domain Issues

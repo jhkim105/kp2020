@@ -1,0 +1,3 @@
+insert into km_money_give (amount, count, created_by, created_date, room_id, token, version, id) values (10000, 2, 'user01', now(), 'room01', 'AAA', 0, 'moneygive01');
+insert into km_money_take (amount, money_give_id, user_id, version, id) values (5023, 'moneygive01', null, 0, 'moneytake01');
+insert into km_money_take (amount, money_give_id, user_id, version, id) values (4977, 'moneygive01', null, 0, 'moneytake02');

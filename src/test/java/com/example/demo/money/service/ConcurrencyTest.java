@@ -28,16 +28,24 @@ public class ConcurrencyTest {
   @Autowired
   MoneyService moneyService;
 
+//  @Autowired
+//  MoneyService moneyConcurrentService;
+
+  @Autowired
+  MoneyConcurrentService moneyConcurrentService;
+
   String token;
   String roomId;
   long amount;
   int count;
 
   @BeforeEach
+//  @Sql(scripts = "/sql/ConcurrencyTest.sql", config = @SqlConfig(encoding = "UTF8"))
   public void beforeEach() {
     roomId = "room01";
     amount = 10000l;
     count = 2;
+    token = "AAA";
     token = moneyService.create(MoneyCreateDto.builder().roomId(roomId).userId("user01").amount(amount).count(count).build());
   }
 
@@ -58,7 +66,7 @@ public class ConcurrencyTest {
   private void take(List<MoneyTake> moneyTakeList, String token, String roomId, String userId) {
     try {
       MoneyTakeDto dto = MoneyTakeDto.builder().roomId(roomId).userId(userId).token(token).build();
-      MoneyTake moneyTake = moneyService.take(dto);
+      MoneyTake moneyTake = moneyConcurrentService.take(dto);
       moneyTakeList.add(moneyTake);
       log.debug("{}:{}", userId, moneyTake);
     } catch(BusinessException | ObjectOptimisticLockingFailureException ex) {

@@ -9,6 +9,8 @@ import com.example.demo.money.repository.MoneyTakeRepository;
 import com.example.demo.util.NumberUtils;
 import java.util.Arrays;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,8 +27,8 @@ public class MoneyService {
   @Autowired
   private MoneyTakeRepository moneyTakeRepository;
 
-//  @PersistenceContext
-//  private EntityManager entityManager;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Transactional
   public String create(MoneyCreateDto moneyCreateDto) {
@@ -70,15 +72,13 @@ public class MoneyService {
   @Transactional
   public MoneyTake take(MoneyTakeDto moneyTakeDto) {
     Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByTokenAndFinishedDateIsNull(moneyTakeDto.getToken());
-    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
-    MoneyGive moneyGive = moneyGiveOptional.get();
+    MoneyGive moneyGive = moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
 //    entityManager.lock(moneyGive, LockModeType.PESSIMISTIC_READ);
 //    entityManager.lock(moneyGive, LockModeType.PESSIMISTIC_WRITE);
-//    entityManager.lock(moneyGive, LockModeType.PESSIMISTIC_FORCE_INCREMENT);
+//    entityManager.lock(moneyGive, LockModeType.PESSIMISTIC_FORCE_INCREMENT); // Test Case Blocking
 
     Optional<MoneyTake> optionalMoneyTake = moneyGive.getAvailableMoneyTake();
-    optionalMoneyTake.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_TAKE));
-    MoneyTake moneyTake = optionalMoneyTake.get();
+    MoneyTake moneyTake  = optionalMoneyTake.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_TAKE));
 //    entityManager.lock(moneyTake, LockModeType.OPTIMISTIC);
 //    entityManager.lock(moneyTake, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
     moneyTake.receive(moneyTakeDto.getUserId());
@@ -88,7 +88,6 @@ public class MoneyService {
   @Transactional(readOnly = true)
   public MoneyGive getMoney(String token) {
     Optional<MoneyGive> moneyGiveOptional = moneyGiveRepository.findByToken(token);
-    moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
-    return moneyGiveOptional.get();
+    return moneyGiveOptional.orElseThrow(() -> new BusinessException(ErrorCode.NOT_EXISTS_MONEY_GIVE));
   }
 }
