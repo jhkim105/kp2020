@@ -21,21 +21,26 @@ class MoneyServiceTest {
 
   @TestConfiguration
   static class TestContextConfiguration {
+    @MockBean
+    MoneyGiveRepository moneyGiveRepository;
+
+    @MockBean
+    MoneyTakeRepository moneyTakeRepository;
+
     @Bean
     public MoneyService moneyService() {
-      return new MoneyService();
+      return new MoneyService(moneyGiveRepository, moneyTakeRepository);
     }
 
   }
 
   @Autowired
-  MoneyService moneyService;
-
-  @MockBean
   MoneyGiveRepository moneyGiveRepository;
 
-  @MockBean
+  @Autowired
   MoneyTakeRepository moneyTakeRepository;
+  @Autowired
+  MoneyService moneyService;
 
   @Test
   void create() {
